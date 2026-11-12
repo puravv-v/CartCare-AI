@@ -1,108 +1,261 @@
-# SRM Agentic AI Hackathon: Starter Template
+# CartCare AI 🛍️
 
-This is the starting point for every team. It already has the setup done, so you can spend your time on your problem statement.
+### AI-Powered E-Commerce Customer Support Assistant
 
-**Stack:** Next.js (App Router) · React · TypeScript · Tailwind CSS · Supabase PostgreSQL · Google Gemini API (function calling) · Zod · Vercel
+CartCare AI is an AI-powered customer support platform designed to simplify e-commerce support operations. Built using **Next.js, Supabase, and Google Gemini**, it helps customers track orders, check return eligibility, submit return requests, and escalate unresolved issues to human support through a conversational AI assistant.
 
-## What is already working
+It also provides a dedicated admin dashboard where support teams can monitor tickets, prioritize issues, and manage their resolution status.
 
-- A passcode login that protects your app and your Gemini quota
-- A Supabase connection (server side only)
-- A Gemini agent loop with function calling: Gemini picks a tool, Zod checks the arguments, your code runs it, and the result goes back to Gemini
-- 3 example tools on a `tasks` table: `listTasks` (reads), `createTask` (writes) and `completeTask` (writes)
-- A chat screen that shows every tool the agent used
-- An example REST API (`/api/tasks`) and a live data list
-- Seed data for all 6 problem statements in `seed/`
+---
 
-## Setup (about 30 minutes)
+## 🚀 Features
 
-1. **Create your team repo.** Click **Use this template** on GitHub and name it `team-<number>-ps<number>`.
-2. **Install.** Run `git clone <your repo>`, `cd` into it, and run `npm install`. You need Node.js 20 or later.
-3. **Create the database.** Create a project on [supabase.com](https://supabase.com). In **SQL Editor**, run `seed/00_starter_example.sql`, then the seed file for your problem.
-4. **Get the keys.**
-   - Supabase **Project Settings**: copy the Project URL and the secret (service_role) key
-   - [Google AI Studio](https://aistudio.google.com): click **Get API key**
-5. **Create `.env.local`.** Copy `.env.example` to `.env.local` and fill in all the values.
-6. **Run it.** Run `npm run dev`, open http://localhost:3000, enter your passcode and try a sample prompt.
-7. **Deploy.** On [vercel.com](https://vercel.com), import the repo, add the same environment variables, and deploy.
+### 👤 Customer Portal
 
-To check your settings, open `/api/health`. It shows which variables are missing (never their values).
+- **AI Support Chat:** Interact with an AI assistant using natural language.
+- **Order Tracking:** Retrieve real-time order information, delivery status, courier details, and tracking numbers from the database.
+- **Return Eligibility:** Automatically check whether an order qualifies for a return based on delivery status and the product's return window.
+- **Return Requests:** Submit return requests directly through the AI assistant.
+- **Human Escalation:** Escalate unresolved or urgent customer issues to human support.
+- **My Orders:** View order history and associated products.
+- **My Returns:** Track submitted return requests and their statuses.
+- **My Support Tickets:** View support tickets raised by the customer.
 
-## Folder guide
+### 🛠️ Admin Portal
 
+- **Admin Dashboard:** Centralized support ticket management.
+- **Ticket Overview:** Monitor total, open, in-progress, and resolved tickets.
+- **Ticket Management:** View customer details, issue descriptions, and associated order IDs.
+- **Priority Management:** Set ticket priorities to Low, Medium, or High.
+- **Status Management:** Update tickets to Open, In Progress, or Resolved.
+- **Ticket Filtering:** Filter tickets by status and priority.
+- **Independent Authentication:** Separate admin login and session management.
+
+---
+
+## 🧰 Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| Next.js | Full-stack React framework |
+| React | Frontend user interface |
+| TypeScript | Type-safe development |
+| Tailwind CSS | UI styling |
+| Supabase | PostgreSQL database and backend |
+| Google Gemini | AI-powered conversational agent |
+| Google GenAI SDK | Gemini model integration |
+| Zod | Input validation |
+| Vercel | Deployment platform |
+
+---
+
+## 🏗️ Architecture
+
+CartCare AI follows a tool-based AI agent architecture.
+
+1. The customer sends a natural-language message through the support chat.
+2. The Next.js API sends the conversation to the Gemini-powered agent.
+3. Gemini determines which backend tool is required.
+4. The selected tool performs the required database operation through Supabase.
+5. The result is returned to the AI agent.
+6. The agent generates a natural-language response for the customer.
+
+### AI Agent Tools
+
+| Tool | Description |
+|---|---|
+| `getMyOrders` | Retrieves the customer's recent orders |
+| `getOrderDetails` | Retrieves details of a specific order |
+| `checkReturnEligibility` | Checks whether a product qualifies for return |
+| `createReturnRequest` | Creates a return request |
+| `escalateToHuman` | Creates a support ticket for human assistance |
+
+Write operations are validated on the server before database changes are made.
+
+---
+
+## 📁 Project Structure
+
+```text
+CartCare-AI/
+│
+├── app/
+│   ├── admin/
+│   │   ├── login/
+│   │   └── tickets/
+│   ├── api/
+│   │   ├── admin/
+│   │   ├── agent/
+│   │   ├── login/
+│   │   ├── orders/
+│   │   ├── returns/
+│   │   └── support-tickets/
+│   ├── login/
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+│
+├── components/
+│   ├── AgentChat.tsx
+│   ├── OverviewDashboard.tsx
+│   ├── OrdersPanel.tsx
+│   ├── ReturnsPanel.tsx
+│   └── SupportTicketsPanel.tsx
+│
+├── lib/
+│   ├── agent/
+│   │   ├── customerContext.ts
+│   │   ├── defineTool.ts
+│   │   ├── runAgent.ts
+│   │   ├── systemPrompt.ts
+│   │   ├── tools.ts
+│   │   └── types.ts
+│   ├── auth.ts
+│   ├── dates.ts
+│   ├── env.ts
+│   ├── gemini.ts
+│   ├── schemas.ts
+│   └── supabase.ts
+│
+├── seed/
+│   └── ps1_ecommerce_support.sql
+│
+├── proxy.ts
+├── .env.example
+├── package.json
+└── README.md
 ```
-app/
-  page.tsx               Home page: agent chat + data list   <- change
-  login/page.tsx         Passcode page
-  api/agent/route.ts     POST /api/agent: runs the agent
-  api/tasks/route.ts     Example REST API                    <- copy for your tables
-  api/health/route.ts    Shows which settings are missing
-components/
-  AgentChat.tsx          Chat UI that shows tool calls       <- change the sample prompts
-  TaskList.tsx           Example data list                   <- replace with your data
-lib/
-  agent/tools.ts         THE AGENT TOOLS                     <- your main work
-  agent/systemPrompt.ts  Instructions for Gemini             <- rewrite for your problem
-  agent/runAgent.ts      The agent loop (max 5 rounds)
-  agent/defineTool.ts    Turns Zod schemas into Gemini tool declarations
-  supabase.ts            Server-side Supabase client
-  schemas.ts             Shared Zod schemas
-proxy.ts                 Passcode gate for every page and API
-seed/                    SQL seed data for each problem statement
+
+---
+
+## ⚙️ Getting Started
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+- Node.js (LTS recommended)
+- npm
+- Git
+- A Supabase project
+- A Google Gemini API key
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/puravv-v/CartCare-AI.git
+cd CartCare-AI
 ```
 
-## How to add a tool (the main hackathon work)
+### 2. Install dependencies
 
-Open `lib/agent/tools.ts` and copy this pattern:
-
-```ts
-const createReturnRequest = defineTool({
-  name: "createReturnRequest",
-  description: "Use this when the customer wants to return a product from a delivered order.",
-  writes: true,
-  schema: z.object({
-    order_id: z.number().int().describe("The order number, for example 1007"),
-    product_id: z.string().describe("The product id, for example P101"),
-    reason: z.string().min(3).describe("Why the customer is returning it"),
-  }),
-  run: async ({ order_id, product_id, reason }) => {
-    // 1. Check your business rule (for example the return window)
-    // 2. Read or write Supabase
-    // 3. Return a small, clean object, or throw new Error("clear message")
-  },
-});
-
-export const tools: AgentTool[] = [createReturnRequest /*, more tools */];
+```bash
+npm install
 ```
 
-Good tools:
+### 3. Configure environment variables
 
-- Have a description that starts with "Use this when..."
-- Describe every field and its format, for example "YYYY-MM-DD"
-- Check business rules in code, not only in the prompt
-- Return small objects that Gemini can read easily
-- Throw clear errors, which the agent then explains to the user
+Create a `.env.local` file in the project root.
 
-Then rewrite `lib/agent/systemPrompt.ts`. Name the business user, the logged-in user id (for example `C001`), your business rules and when to use each tool.
+Copy the structure from `.env.example` and fill in your own credentials.
 
-## Rules to remember
+```env
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-3.5-flash
 
-- Never commit `.env.local`. It is already in `.gitignore`.
-- Never use `SUPABASE_SECRET_KEY` in frontend code. Only files under `lib/` and `app/api/` may use it.
-- Do not change the core stack.
-- Before you push, run `npm run build`. If it fails on your laptop, it will fail on Vercel too.
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SECRET_KEY=your_supabase_secret_key
 
-## Seed files
+APP_PASSCODE=your_customer_passcode
+APP_ADMIN_PASSCODE=your_admin_passcode
+```
 
-| File | Problem |
-| --- | --- |
-| `00_starter_example.sql` | Example `tasks` table (run first) |
-| `demo_eventease.sql` | Day 1 lab: EventEase campus events |
-| `ps1_ecommerce_support.sql` | PS1 E-commerce Customer Support Agent |
-| `ps2_inventory_restock.sql` | PS2 Inventory Restock Agent |
-| `ps3_clinic_appointments.sql` | PS3 Clinic Appointment Agent |
-| `ps4_it_helpdesk.sql` | PS4 IT Helpdesk Ticket Agent |
-| `ps5_expense_claims.sql` | PS5 Expense Claim Assistant |
-| `ps6_job_match.sql` | PS6 Job Match Agent |
+**Important:** Never commit `.env.local` or expose your Gemini API key and Supabase secret key in frontend code.
 
-All dates in the seed data are relative to today, so the data is always fresh. All names, companies and records are made up. You can run a seed file again at any time to reset your data.
+### 4. Set up Supabase
+
+1. Create a new project in Supabase.
+2. Open the SQL Editor.
+3. Execute the SQL script from:
+
+```text
+seed/ps1_ecommerce_support.sql
+```
+
+4. Configure the Supabase project URL and secret key in `.env.local`.
+
+The seed script creates the customer, product, order, order item, return, and support ticket tables along with sample data.
+
+### 5. Run the development server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 🧪 Available Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the development server |
+| `npm run build` | Create a production build |
+| `npm run start` | Start the production server |
+| `npm run typecheck` | Run TypeScript checks |
+
+---
+
+## 💬 Example Customer Queries
+
+Try these prompts in the customer support chat:
+
+**Order Tracking**
+> Where is my order 1003?
+
+**Return Request**
+> I want to return the shoes from my last order, they are too small.
+
+**Human Escalation**
+> My order is 4 days late and nobody is answering.
+
+The AI agent uses backend tools to retrieve order information, validate return eligibility, create return requests, and escalate issues when necessary.
+
+---
+
+## 🔐 Security
+
+- Separate customer and administrator authentication.
+- Server-side session validation.
+- Customer-specific data access restrictions.
+- Server-side Supabase operations.
+- Input validation using Zod.
+- Restricted admin ticket management APIs.
+- Environment secrets excluded from version control.
+
+---
+
+## 🛣️ Future Improvements
+
+- Real customer authentication and account registration.
+- Live courier tracking integrations.
+- Email and WhatsApp notifications.
+- Advanced analytics for support operations.
+- AI-powered ticket categorization and response suggestions.
+- Automated order cancellation where business rules permit.
+
+---
+
+## 👨‍💻 Author
+
+**Purav Agarwal**
+
+- GitHub: [@puravv-v](https://github.com/puravv-v)
+- LinkedIn: [Purav Agarwal](https://www.linkedin.com/in/purav-agarwal-9a95a4351/)
+
+---
+
+⭐ If you find this project interesting, consider giving it a star!
+
+**CartCare AI — Smarter Support. Happier Customers.**
